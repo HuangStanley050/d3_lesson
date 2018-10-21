@@ -13,12 +13,16 @@ const graph = svg.append('g')
     .attr('height', graphHeight)
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
+const xAxisGroup = graph.append('g')
+    .attr('transform', `translate(0,${graphHeight})`);
+const yAxisGroup = graph.append('g');
+
 d3.json('menu.json').then(data => {
 
 
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.orders)])
-        .range([0, 500]);
+        .range([graphHeight, 0]);
 
     const x = d3.scaleBand()
         .domain(data.map(item => item.name))
@@ -35,15 +39,24 @@ d3.json('menu.json').then(data => {
     const rects = graph.selectAll('rect').data(data);
 
     rects.attr('width', x.bandwidth)
-        .attr('height', d => y(d.orders))
+        .attr('height', d => graphHeight - y(d.orders))
         .attr('fill', 'orange')
-        .attr('x', d => x(d.name));
+        .attr('x', d => x(d.name))
+        .attr('y', d => y(d.orders));
 
     rects.enter()
         .append('rect')
         .attr('width', x.bandwidth)
-        .attr('height', d => y(d.orders))
+        .attr('height', d => graphHeight - y(d.orders))
         .attr('fill', 'orange')
-        .attr('x', d => x(d.name));
+        .attr('x', d => x(d.name))
+        .attr('y', d => y(d.orders));
+
+
+    const xAxis = d3.axisBottom(x);
+    const yAxis = d3.axisLeft(y);
+
+    xAxisGroup.call(xAxis);
+    yAxisGroup.call(yAxis);
 
 });
