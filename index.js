@@ -19,25 +19,30 @@ const xAxisGroup = graph.append('g')
     .attr('transform', `translate(0,${graphHeight})`);
 const yAxisGroup = graph.append('g');
 
-db.collection('dishes').get().then(res => {
+const y = d3.scaleLinear()
+    .range([graphHeight, 0]);
 
-    var data = [];
-    res.docs.forEach(doc => data.push(doc.data()));
-    //console.log(data);
+const x = d3.scaleBand()
+    .range([0, 500])
+    .paddingInner(0.2)
+    .paddingOuter(0.2);
 
-    const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.orders)])
-        .range([graphHeight, 0]);
+const xAxis = d3.axisBottom(x);
+const yAxis = d3.axisLeft(y)
+    .ticks(3)
+    .tickFormat(d => d + ' Orders');
 
-    const x = d3.scaleBand()
-        .domain(data.map(item => item.name))
-        .range([0, 500])
-        .paddingInner(0.2)
-        .paddingOuter(0.2);
+xAxisGroup.selectAll('text')
+    .attr('transform', 'rotate(-40)')
+    .attr('text-anchor', 'end')
+    .attr('fill', 'green');
 
+const update = (data) => {
 
-
+    y.domain([0, d3.max(data, d => d.orders)]);
+    x.domain(data.map(item => item.name));
     const rects = graph.selectAll('rect').data(data);
+    rects.exit().remove();
 
     rects.attr('width', x.bandwidth)
         .attr('height', d => graphHeight - y(d.orders))
@@ -53,18 +58,15 @@ db.collection('dishes').get().then(res => {
         .attr('x', d => x(d.name))
         .attr('y', d => y(d.orders));
 
-
-    const xAxis = d3.axisBottom(x);
-    const yAxis = d3.axisLeft(y)
-        .ticks(3)
-        .tickFormat(d => d + ' Orders');
-
     xAxisGroup.call(xAxis);
     yAxisGroup.call(yAxis);
 
-    xAxisGroup.selectAll('text')
-        .attr('transform', 'rotate(-40)')
-        .attr('text-anchor', 'end')
-        .attr('fill', 'green');
+};
 
+db.collection('dishes').get().then(res => {
+
+    var data = [];
+    res.docs.forEach(doc => data.push(doc.data()));
+    //console.log(data);
+    update(data);
 });
