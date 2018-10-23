@@ -1,6 +1,8 @@
 /*global d3 */
 /*global db */
 /*global firebase */
+
+//===============Visualization set up===========================//
 const svg = d3.select('.canvas')
     .append('svg')
     .attr('width', 600)
@@ -37,6 +39,10 @@ xAxisGroup.selectAll('text')
     .attr('text-anchor', 'end')
     .attr('fill', 'green');
 
+//===========================End Set up================================//
+
+
+//==================Function that draws the chart========================//
 const update = (data) => {
 
     y.domain([0, d3.max(data, d => d.orders)]);
@@ -62,11 +68,42 @@ const update = (data) => {
     yAxisGroup.call(yAxis);
 
 };
+//===========================end Drawing function================//
 
+//=================Fetching data only once==========================//
+/*
 db.collection('dishes').get().then(res => {
 
     var data = [];
     res.docs.forEach(doc => data.push(doc.data()));
     //console.log(data);
+    update(data);
+    
+});
+*/
+//====================================================================//
+
+//===================Listening to data changes in firesbase=================//
+var data = [];
+
+db.collection('dishes').onSnapshot(res => {
+    res.docChanges().forEach(change => {
+        const doc = { ...change.doc.data(), id: change.doc.id };
+        //console.log(doc);
+        switch (change.type) {
+            case "added":
+                data.push(doc);
+                break;
+            case "modified":
+                const index = data.findIndex(item => item.id == doc.id);
+                data[index] = doc;
+                break;
+            case "removed":
+                data = data.filter(item => item.id !== doc.id);
+                break;
+            default:
+                break;
+        }
+    });
     update(data);
 });
