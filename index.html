@@ -1,16 +1,41 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title> </title>
-    </head>
-    <body>
-    
- 
-      <div class="canvas">
-          
-      </div>
-    
+
+<head>
+    <title> </title>
+</head>
+
+<body>
+
+
+    <div class="canvas">
+
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script>
+    <script>
+        // Initialize Firebase
+        //*global firebase*/
+        var config = {
+            apiKey: "AIzaSyCI85XQ0H-0imAqGfPU_jbgvRm2DgXCxTY",
+            authDomain: "udemy-d3.firebaseapp.com",
+            databaseURL: "https://udemy-d3.firebaseio.com",
+            projectId: "udemy-d3",
+            storageBucket: "udemy-d3.appspot.com",
+            messagingSenderId: "299469835504"
+        };
+        firebase.initializeApp(config);
+        const db = firebase.firestore();
+
+// Disable deprecated features
+db.settings({
+  timestampsInSnapshots: true
+});
+    </script>
     <script src="https://d3js.org/d3.v5.js"></script>
     <script src="index.js"></script>
-    </body>
+</body>
+
 </html>

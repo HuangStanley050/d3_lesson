@@ -1,4 +1,6 @@
 /*global d3 */
+/*global db */
+/*global firebase */
 const svg = d3.select('.canvas')
     .append('svg')
     .attr('width', 600)
@@ -17,8 +19,11 @@ const xAxisGroup = graph.append('g')
     .attr('transform', `translate(0,${graphHeight})`);
 const yAxisGroup = graph.append('g');
 
-d3.json('menu.json').then(data => {
+db.collection('dishes').get().then(res => {
 
+    var data = [];
+    res.docs.forEach(doc => data.push(doc.data()));
+    //console.log(data);
 
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.orders)])
@@ -30,11 +35,7 @@ d3.json('menu.json').then(data => {
         .paddingInner(0.2)
         .paddingOuter(0.2);
 
-    /*const min = d3.min(d => d.orders);
-    const max = d3.max(d => d.orders);
-    const extent = d3.extent(d => d.orders);
-    console.log(min, max);
-    */
+
 
     const rects = graph.selectAll('rect').data(data);
 
@@ -54,9 +55,16 @@ d3.json('menu.json').then(data => {
 
 
     const xAxis = d3.axisBottom(x);
-    const yAxis = d3.axisLeft(y);
+    const yAxis = d3.axisLeft(y)
+        .ticks(3)
+        .tickFormat(d => d + ' Orders');
 
     xAxisGroup.call(xAxis);
     yAxisGroup.call(yAxis);
+
+    xAxisGroup.selectAll('text')
+        .attr('transform', 'rotate(-40)')
+        .attr('text-anchor', 'end')
+        .attr('fill', 'green');
 
 });
