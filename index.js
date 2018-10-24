@@ -51,18 +51,27 @@ const update = (data) => {
     rects.exit().remove();
 
     rects.attr('width', x.bandwidth)
-        .attr('height', d => graphHeight - y(d.orders))
         .attr('fill', 'orange')
         .attr('x', d => x(d.name))
+        .transition().duration(1000)
+        .attr('height', d => graphHeight - y(d.orders))
         .attr('y', d => y(d.orders));
 
     rects.enter()
         .append('rect')
         .attr('width', x.bandwidth)
-        .attr('height', d => graphHeight - y(d.orders))
+        .attr('height', 0)
         .attr('fill', 'orange')
         .attr('x', d => x(d.name))
+        .attr('y', d => graphHeight)
+        .transition().duration(1000)
+        .attr('height', d => graphHeight - y(d.orders))
         .attr('y', d => y(d.orders));
+
+
+    /*
+    
+    */
 
     xAxisGroup.call(xAxis);
     yAxisGroup.call(yAxis);
